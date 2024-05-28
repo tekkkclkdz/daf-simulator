@@ -1,39 +1,35 @@
 "use client"
 import { useState, useRef } from 'react';
-import internal from 'stream';
 
 export default function Home() {
-  const [delay, setDelay] = useState(0);
+  const [delay, setDelay] = useState(500);
   const [playbackDelay, setPlaybackDelay] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
-  const audioContextRef = useRef(null);
-  const mediaStreamRef = useRef(null);
-  const sourceRef = useRef(null);
-  const delayNodeRef = useRef(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
+  const delayNodeRef = useRef<DelayNode | null>(null);
 
-
-
-  const updatePlaybackDelay = ( { value } : {
-    value: number
-  }) => {
+  const updatePlaybackDelay = (value: number) => {
     setPlaybackDelay(value);
-    if (isRecording) {
+    if (isRecording && delayNodeRef.current && audioContextRef.current) {
       delayNodeRef.current.delayTime.value = (delay + value) / 1000; // Opóźnienie w sekundach
     }
   };
 
   const startRecording = async () => {
-    audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+    audioContextRef.current = new (window.AudioContext || window.AudioContext)();
     mediaStreamRef.current = await navigator.mediaDevices.getUserMedia({ audio: true });
-    sourceRef.current = audioContextRef.current.createMediaStreamSource(mediaStreamRef.current);
-
-    delayNodeRef.current = audioContextRef.current.createDelay();
-    delayNodeRef.current.delayTime.value = (delay + playbackDelay) / 1000; // Opóźnienie w sekundach
-
-    sourceRef.current.connect(delayNodeRef.current);
-    delayNodeRef.current.connect(audioContextRef.current.destination);
-
-    setIsRecording(true);
+    if (audioContextRef.current && mediaStreamRef.current) {
+      sourceRef.current = audioContextRef.current.createMediaStreamSource(mediaStreamRef.current);
+      delayNodeRef.current = audioContextRef.current.createDelay();
+      delayNodeRef.current.delayTime.value = (delay + playbackDelay) / 1000; // Opóźnienie w sekundach
+      if (sourceRef.current && delayNodeRef.current) {
+        sourceRef.current.connect(delayNodeRef.current);
+        delayNodeRef.current.connect(audioContextRef.current.destination);
+      }
+      setIsRecording(true);
+    }
   };
 
   const stopRecording = () => {
@@ -48,9 +44,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center">
-      <h1 className="text-4xl font-bold mb-8">Symulator Opóźnionego Sprzężenia Zwrotnego (DAF)</h1>
+      <h1 className="text-4xl font-bold mb-8 text-white">Symulator Opóźnionego Sprzężenia Zwrotnego (DAF)</h1>
       <div className="mb-4">
-        <label htmlFor="delay" className="block text-lg mb-2">Opóźnienie (ms): {delay + playbackDelay}</label>
+        <label htmlFor="delay" className="block text-lg mb-2 text-white">Opóźnienie (ms): {delay + playbackDelay}</label>
         <input
           type="range"
           min="0"
