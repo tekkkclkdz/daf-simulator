@@ -2,7 +2,7 @@
 import { useState, useRef } from 'react';
 
 export default function Home() {
-  const [delay, setDelay] = useState(500);
+  const [delay, setDelay] = useState(0);
   const [playbackDelay, setPlaybackDelay] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
