@@ -43,7 +43,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-red-800 flex flex-col items-center justify-center">
       <h1 className="text-4xl font-bold mb-8 text-white">Symulator Opóźnionego Sprzężenia Zwrotnego (DAF)</h1>
       <div className="mb-4">
         <label htmlFor="delay" className="block text-lg mb-2 text-white">Opóźnienie (ms): {delay + playbackDelay}</label>
